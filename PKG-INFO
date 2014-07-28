@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: cql
-Version: 1.4.1
+Version: 1.5.0
 Summary: Cassandra Query Language driver
 Home-page: http://code.google.com/a/apache-extras.org/p/cassandra-dbapi2
 Author: Cassandra DBAPI-2 Driver Team

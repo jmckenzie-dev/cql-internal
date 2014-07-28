@@ -40,7 +40,7 @@ NUMBER = DBAPITypeObject(cqltypes.LongType, cqltypes.IntegerType, cqltypes.Decim
                          cqltypes.FloatType, cqltypes.DoubleType, cqltypes.Int32Type,
                          cqltypes.CounterColumnType)
 
-DATETIME = DBAPITypeObject(cqltypes.TimeUUIDType, cqltypes.DateType)
+DATETIME = DBAPITypeObject(cqltypes.TimeUUIDType, cqltypes.DateType, cqltypes.SimpleDateType, cqltypes.TimeType)
 
 # just include all of them
 ROWID = DBAPITypeObject(*cqltypes._cqltypes.values())

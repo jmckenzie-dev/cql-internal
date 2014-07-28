@@ -438,13 +438,29 @@ class CounterColumnType(_CassandraType):
     deserialize = staticmethod(int64_unpack)
     serialize = staticmethod(int64_pack)
 
-cql_time_formats = (
+cql_timestamp_formats = (
     '%Y-%m-%d %H:%M',
     '%Y-%m-%d %H:%M:%S',
     '%Y-%m-%dT%H:%M',
     '%Y-%m-%dT%H:%M:%S',
     '%Y-%m-%d'
 )
+
+cql_time_formats = (
+    '%H:%M',
+    '%H:%M:%S',
+    '%H:%M:%S.%f'
+)
+
+cql_simple_date_formats = (
+    '%Y-%m-%d'
+)
+
+def deserialize_time(byts):
+    return int64_unpack(byts) / 1000.0
+
+def serialize_time(time_value):
+    return int64_pack(time_value * 1000)
 
 class DateType(_CassandraType):
     typename = 'timestamp'
@@ -462,7 +478,7 @@ class DateType(_CassandraType):
             date = date[:-5]
         else:
             offset = -time.timezone
-        for tformat in cql_time_formats:
+        for tformat in cql_timestamp_formats:
             try:
                 tval = time.strptime(date, tformat)
             except ValueError:
@@ -474,13 +490,54 @@ class DateType(_CassandraType):
     def my_timestamp(self):
         return self.val
 
-    @staticmethod
-    def deserialize(byts):
-        return int64_unpack(byts) / 1000.0
+    deserialize = staticmethod(deserialize_time)
+    serialize = staticmethod(serialize_time)
+
+class SimpleDateType(_CassandraType):
+    typename = 'date'
+
+    @classmethod
+    def validate(cls, date):
+        if isinstance(date, basestring):
+            date = cls.interpret_simpledate_string(date)
+        return date
 
     @staticmethod
-    def serialize(timestamp):
-        return int64_pack(timestamp * 1000)
+    def interpret_simpledate_string(date):
+        for tformat in cql_simple_date_formats:
+            try:
+                tval = time.strftime(tformat, date)
+            except ValueError:
+                continue
+            return tval
+        else:
+            raise ValueError("can't interpret %r as a date" % (date,))
+
+    deserialize = staticmethod(deserialize_time)
+    serialize = staticmethod(serialize_time)
+
+class TimeType(_CassandraType):
+    typename = 'time'
+
+    @classmethod
+    def validate(cls, time):
+        if isinstance(time, basestring):
+            time = cls.interpret_timestring(time)
+        return time
+
+    @staticmethod
+    def interpret_timestring(time):
+        for tformat in cql_time_formats:
+            try:
+                tval = time.strptime(time, tformat)
+            except ValueError:
+                continue
+            return tval
+        else:
+            raise ValueError("can't interpret %r as a time" % (time,))
+
+    deserialize = staticmethod(deserialize_time)
+    serialize = staticmethod(serialize_time)
 
 class TimeUUIDType(DateType):
     typename = 'timeuuid'

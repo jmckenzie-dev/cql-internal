@@ -386,6 +386,8 @@ class ResultMessage(_MessageType):
         0x000E: 'varint',
         0x000F: 'timeuuid',
         0x0010: 'inet',
+        0x0011: 'date',
+        0x0012: 'time',
         0x0020: 'list',
         0x0021: 'map',
         0x0022: 'set',
